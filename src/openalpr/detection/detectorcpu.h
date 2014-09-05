@@ -17,48 +17,33 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OPENALPR_REGIONDETECTOR_H
-#define OPENALPR_REGIONDETECTOR_H
+#ifndef OPENALPR_DETECTORCPU_H
+#define	OPENALPR_DETECTORCPU_H
 
-#include <iostream>
 #include <stdio.h>
+#include <iostream>
+#include <vector>
 
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/core/core.hpp"
 #include "opencv2/ml/ml.hpp"
 
-#include "utility.h"
-#include "support/timing.h"
-#include "constants.h"
+#include "detector.h"
 
-struct PlateRegion
-{
-  cv::Rect rect;
-  std::vector<PlateRegion> children;
+class DetectorCPU : public Detector {
+public:
+    DetectorCPU(Config* config);
+    virtual ~DetectorCPU();
+    
+    std::vector<PlateRegion> detect(cv::Mat frame, std::vector<cv::Rect> regionsOfInterest);
+    
+private:
+    
+    cv::CascadeClassifier plate_cascade;
+
+    std::vector<PlateRegion> doCascade(cv::Mat frame, std::vector<cv::Rect> regionsOfInterest);
 };
 
-class RegionDetector
-{
+#endif	/* OPENALPR_DETECTORCPU_H */
 
-  public:
-    RegionDetector(Config* config);
-    virtual ~RegionDetector();
-
-    bool isLoaded();
-    std::vector<PlateRegion> detect(cv::Mat frame);
-
-  private:
-    Config* config;
-
-    float scale_factor;
-    cv::CascadeClassifier* plate_cascade;
-
-    bool loaded;
-
-    std::vector<PlateRegion> doCascade(cv::Mat frame);
-
-    std::vector<PlateRegion> aggregateRegions(std::vector<cv::Rect> regions);
-};
-
-#endif // OPENALPR_REGIONDETECTOR_H

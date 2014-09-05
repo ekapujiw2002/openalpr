@@ -30,6 +30,7 @@
 
 #include "endtoendtest.h"
 
+#include "detection/detectorfactory.h"
 #include "support/filesystem.h"
 
 using namespace std;
@@ -92,7 +93,7 @@ int main( int argc, const char** argv )
 
     for (int i = 0; i< files.size(); i++)
     {
-      if (hasEnding(files[i], ".png"))
+      if (hasEnding(files[i], ".png") || hasEnding(files[i], ".jpg"))
       {
         string fullpath = inDir + "/" + files[i];
 
@@ -146,21 +147,23 @@ int main( int argc, const char** argv )
   else if (benchmarkName.compare("detection") == 0)
   {
     Config config(country);
-    RegionDetector plateDetector(&config);
+    Detector* plateDetector = createDetector(&config);
 
     for (int i = 0; i< files.size(); i++)
     {
-      if (hasEnding(files[i], ".png"))
+      if (hasEnding(files[i], ".png") || hasEnding(files[i], ".jpg"))
       {
         string fullpath = inDir + "/" + files[i];
         frame = imread( fullpath.c_str() );
 
-        vector<PlateRegion> regions = plateDetector.detect(frame);
+        vector<PlateRegion> regions = plateDetector->detect(frame);
 
         imshow("Current LP", frame);
         waitKey(5);
       }
     }
+    
+    delete plateDetector;
   }
   else if (benchmarkName.compare("speed") == 0)
   {
@@ -176,7 +179,7 @@ int main( int argc, const char** argv )
     alpr.config->debugOff();
     alpr.setDetectRegion(true);
 
-    RegionDetector plateDetector(&config);
+    Detector* plateDetector = createDetector(&config);
     StateIdentifier stateIdentifier(&config);
     OCR ocr(&config);
 
@@ -190,7 +193,7 @@ int main( int argc, const char** argv )
 
     for (int i = 0; i< files.size(); i++)
     {
-      if (hasEnding(files[i], ".png"))
+      if (hasEnding(files[i], ".png") || hasEnding(files[i], ".jpg"))
       {
         cout << "Image: " << files[i] << endl;
 
@@ -198,14 +201,16 @@ int main( int argc, const char** argv )
         frame = imread( fullpath.c_str() );
 
         getTime(&startTime);
-        alpr.recognize(frame);
+        vector<Rect> regionsOfInterest;
+        regionsOfInterest.push_back(Rect(0, 0, frame.cols, frame.rows));
+        alpr.recognize(frame, regionsOfInterest);
         getTime(&endTime);
         double endToEndTime = diffclock(startTime, endTime);
         cout << " -- End to End recognition time: " << endToEndTime << "ms." << endl;
         endToEndTimes.push_back(endToEndTime);
 
         getTime(&startTime);
-        vector<PlateRegion> regions = plateDetector.detect(frame);
+        vector<PlateRegion> regions = plateDetector->detect(frame);
         getTime(&endTime);
 
         double regionDetectionTime = diffclock(startTime, endTime);

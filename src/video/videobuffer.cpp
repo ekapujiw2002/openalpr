@@ -72,12 +72,12 @@ void VideoBuffer::connect(std::string mjpeg_url, int fps)
     
 }
 
-int VideoBuffer::getLatestFrame(cv::Mat* frame)
+int VideoBuffer::getLatestFrame(cv::Mat* frame, std::vector<cv::Rect>& regionsOfInterest)
 {
   if (dispatcher == NULL)
     return -1;
   
-  return dispatcher->getLatestFrame(frame);
+  return dispatcher->getLatestFrame(frame, regionsOfInterest);
 }
 
 
@@ -135,7 +135,7 @@ void imageCollectionThread(void* arg)
     }
     
     // Delay 1 second
-    usleep(1000000);
+    sleep_ms(1000);
     
   }
 
@@ -189,10 +189,10 @@ void getALPRImages(cv::VideoCapture cap, VideoDispatcher* dispatcher)
       
 
       // Delay 15ms
-      usleep(15000);    
+      sleep_ms(15);    
     }
     
     // Delay 100ms
-    usleep(100000);
+    sleep_ms(100);
   }
 }

@@ -5,7 +5,7 @@
 
 #include "daemon/beanstalk.hpp"
 #include "daemon/uuid.h"
-#include "daemon/logging_videobuffer.h"
+#include "video/logging_videobuffer.h"
 
 #include "tclap/CmdLine.h"
 #include "alpr.h"
@@ -84,6 +84,7 @@ int main( int argc, const char** argv )
   try
   {
     
+    cmd.add( countryCodeArg );
     cmd.add( topNArg );
     cmd.add( configFileArg );
     cmd.add( logFileArg );
@@ -242,7 +243,8 @@ void streamRecognitionThread(void* arg)
   
   while (daemon_active)
   {
-    int response = videoBuffer.getLatestFrame(&latestFrame);
+    std::vector<cv::Rect> regionsOfInterest;
+    int response = videoBuffer.getLatestFrame(&latestFrame, regionsOfInterest);
     
     if (response != -1)
     {

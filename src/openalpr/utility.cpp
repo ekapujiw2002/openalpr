@@ -45,13 +45,13 @@ Rect expandRect(Rect original, int expandXPixels, int expandYPixels, int maxX, i
   return expandedRegion;
 }
 
-Mat drawImageDashboard(vector<Mat> images, int imageType, int numColumns)
+Mat drawImageDashboard(vector<Mat> images, int imageType, uint numColumns)
 {
-  int numRows = ceil((float) images.size() / (float) numColumns);
+  uint numRows = ceil((float) images.size() / (float) numColumns);
 
   Mat dashboard(Size(images[0].cols * numColumns, images[0].rows * numRows), imageType);
 
-  for (int i = 0; i < numColumns * numRows; i++)
+  for (uint i = 0; i < numColumns * numRows; i++)
   {
     if (i < images.size())
       images[i].copyTo(dashboard(Rect((i%numColumns) * images[i].cols, floor((float) i/numColumns) * images[i].rows, images[i].cols, images[i].rows)));
@@ -104,7 +104,10 @@ void drawAndWait(cv::Mat* frame)
 void displayImage(Config* config, string windowName, cv::Mat frame)
 {
   if (config->debugShowImages)
+  {
     imshow(windowName, frame);
+    cv::waitKey(5);
+  }
 }
 
 vector<Mat> produceThresholds(const Mat img_gray, Config* config)
@@ -382,6 +385,10 @@ std::string toString(int value)
   stringstream ss;
   ss << value;
   return ss.str();
+}
+std::string toString(uint value)
+{
+  return toString((int) value);
 }
 std::string toString(float value)
 {

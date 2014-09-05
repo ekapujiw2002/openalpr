@@ -12,3 +12,25 @@ benchmarks/
 website/
 utilities/
 samples/
+nbproject/
+runtime_data/keypoints/source.txt
+*.deb
+*.rpm
+openalpr_*.tar.gz
+openalpr-*.asc
+openalpr-*.sig
+openalpr-*.tar.gz
+
+# Visual Studio files
+*.vcxproj
+*.vcxproj.*
+*.suo
+*.sln
+*.sdf
+*.opensdf
+*.dir/
+Debug/
+Release/
+
+
+cmake_install.cmake

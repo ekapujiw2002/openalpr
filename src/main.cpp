@@ -29,7 +29,8 @@
 #include "tclap/CmdLine.h"
 #include "support/filesystem.h"
 #include "support/timing.h"
-#include "videobuffer.h"
+#include "support/platform.h"
+#include "video/videobuffer.h"
 #include "alpr.h"
 
 const std::string MAIN_WINDOW_NAME = "ALPR main window";
@@ -154,7 +155,7 @@ int main( int argc, const char** argv )
     while (cap.read(frame))
     {
       detectandshow(&alpr, frame, "", outputJson);
-      usleep(1000);
+      sleep_ms(10);
       framenum++;
     }
   }
@@ -170,7 +171,8 @@ int main( int argc, const char** argv )
     
     while (program_active)
     {
-      int response = videoBuffer.getLatestFrame(&latestFrame);
+      std::vector<cv::Rect> regionsOfInterest;
+      int response = videoBuffer.getLatestFrame(&latestFrame, regionsOfInterest);
       
       if (response != -1)
       {
@@ -178,7 +180,7 @@ int main( int argc, const char** argv )
       }
       
       // Sleep 10ms
-      usleep(10000);
+      sleep_ms(10);
     }
     
     videoBuffer.disconnect();
@@ -206,7 +208,7 @@ int main( int argc, const char** argv )
 
         detectandshow( &alpr, frame, "", outputJson);
         //create a 1ms delay
-        usleep(1000);
+        sleep_ms(1);
         framenum++;
       }
     }
@@ -222,7 +224,10 @@ int main( int argc, const char** argv )
     {
       frame = cv::imread( filename );
 
-      detectandshow( &alpr, frame, "", outputJson);
+      bool plate_found = detectandshow( &alpr, frame, "", outputJson);
+      
+      if (!plate_found && !outputJson)
+	std::cout << "No license plates found." << std::endl;
     }
     else
     {
@@ -290,7 +295,11 @@ bool detectandshow( Alpr* alpr, cv::Mat frame, std::string region, bool writeJso
   {
     for (int i = 0; i < results.size(); i++)
     {
-      std::cout << "plate" << i << ": " << results[i].result_count << " results -- Processing Time = " << results[i].processing_time_ms << "ms." << std::endl;
+      std::cout << "plate" << i << ": " << results[i].result_count << " results";
+	  if (measureProcessingTime)
+		std::cout << " -- Processing Time = " << results[i].processing_time_ms << "ms.";
+	  std::cout << std::endl;
+
 
       for (int k = 0; k < results[i].topNPlates.size(); k++)
       {

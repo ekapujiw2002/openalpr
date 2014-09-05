@@ -17,42 +17,45 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OPENALPR_OCR_H
-#define OPENALPR_OCR_H
+#ifndef OPENALPR_REGIONDETECTOR_H
+#define OPENALPR_REGIONDETECTOR_H
 
 #include <iostream>
 #include <stdio.h>
 
+
 #include "utility.h"
-#include "postprocess.h"
-#include "config.h"
-#include "pipeline_data.h"
-
+#include "support/timing.h"
 #include "constants.h"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "support/filesystem.h"
 
-#include "tesseract/baseapi.h"
+struct PlateRegion
+{
+  cv::Rect rect;
+  std::vector<PlateRegion> children;
+};
 
-class OCR
+
+class Detector
 {
 
   public:
-    OCR(Config* config);
-    virtual ~OCR();
+    Detector(Config* config);
+    virtual ~Detector();
 
-    void performOCR(PipelineData* pipeline_data);
+    bool isLoaded();
+    std::vector<PlateRegion> detect(cv::Mat frame);
+    virtual std::vector<PlateRegion> detect(cv::Mat frame, std::vector<cv::Rect> regionsOfInterest);
 
-    PostProcess* postProcessor;
-    //string recognizedText;
-    //float confidence;
-    //float overallConfidence;
-
-  private:
+  protected:
     Config* config;
 
-    tesseract::TessBaseAPI *tesseract;
+    bool loaded;
+    float scale_factor;
+    
+    std::vector<PlateRegion> aggregateRegions(std::vector<cv::Rect> regions);
+    
+
 
 };
 
-#endif // OPENALPR_OCR_H
+#endif // OPENALPR_REGIONDETECTOR_H

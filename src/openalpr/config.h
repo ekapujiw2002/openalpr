@@ -24,6 +24,7 @@
 
 #include "simpleini/simpleini.h"
 #include "support/filesystem.h"
+#include "support/platform.h"
 
 #include "constants.h"
 
@@ -43,9 +44,6 @@ class Config
     bool loaded;
     
     std::string country;
-    
-    bool opencl_enabled;
-    int multithreading_cores;
     
     float detection_iteration_increase;
     int detectionStrictness;
@@ -93,9 +91,9 @@ class Config
     
     float postProcessMinConfidence;
     float postProcessConfidenceSkipLevel;
-    int postProcessMaxSubstitutions;
-    int postProcessMinCharacters;
-    int postProcessMaxCharacters;
+    uint postProcessMaxSubstitutions;
+    uint postProcessMinCharacters;
+    uint postProcessMaxCharacters;
 
     
     bool debugGeneral;

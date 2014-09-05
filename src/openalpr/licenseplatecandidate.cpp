@@ -83,7 +83,7 @@ void LicensePlateCandidate::recognize()
 vector<Point2f> LicensePlateCandidate::transformPointsToOriginalImage(Mat bigImage, Mat smallImage, Rect region, vector<Point> corners)
 {
   vector<Point2f> cornerPoints;
-  for (int i = 0; i < corners.size(); i++)
+  for (uint i = 0; i < corners.size(); i++)
   {
     float bigX = (corners[i].x * ((float) region.width / smallImage.cols));
     float bigY = (corners[i].y * ((float) region.height / smallImage.rows));
@@ -99,6 +99,10 @@ vector<Point2f> LicensePlateCandidate::transformPointsToOriginalImage(Mat bigIma
 
 Mat LicensePlateCandidate::deSkewPlate(Mat inputImage, vector<Point2f> corners)
 {
+  
+  timespec startTime;
+  getTime(&startTime);
+  
   // Figure out the appoximate width/height of the license plate region, so we can maintain the aspect ratio.
   LineSegment leftEdge(round(corners[3].x), round(corners[3].y), round(corners[0].x), round(corners[0].y));
   LineSegment rightEdge(round(corners[2].x), round(corners[2].y), round(corners[1].x), round(corners[1].y));
@@ -130,8 +134,15 @@ Mat LicensePlateCandidate::deSkewPlate(Mat inputImage, vector<Point2f> corners)
   Mat transmtx = getPerspectiveTransform(corners, quad_pts);
 
   // Apply perspective transformation
-  warpPerspective(inputImage, deskewed, transmtx, deskewed.size());
+  warpPerspective(inputImage, deskewed, transmtx, deskewed.size(), INTER_CUBIC);
 
+  if (config->debugTiming)
+  {
+    timespec endTime;
+    getTime(&endTime);
+    cout << "deskew Time: " << diffclock(startTime, endTime) << "ms." << endl;
+  }
+  
   if (this->config->debugGeneral)
     displayImage(config, "quadrilateral", deskewed);
 

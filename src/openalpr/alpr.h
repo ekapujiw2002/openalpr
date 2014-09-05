@@ -30,13 +30,20 @@ struct AlprPlate
   float overall_confidence;
 
   bool matches_template;
-  //int char_confidence[];
 };
 
 struct AlprCoordinate
 {
   int x;
   int y;
+};
+
+struct AlprRegionOfInterest
+{
+  int x;
+  int y;
+  int width;
+  int height;
 };
 
 class AlprResult
@@ -71,7 +78,9 @@ class Alpr
     void setDefaultRegion(std::string region);
 
     std::vector<AlprResult> recognize(std::string filepath);
+    std::vector<AlprResult> recognize(std::string filepath, std::vector<AlprRegionOfInterest> regionsOfInterest);
     std::vector<AlprResult> recognize(std::vector<unsigned char> imageBuffer);
+    std::vector<AlprResult> recognize(std::vector<unsigned char> imageBuffer, std::vector<AlprRegionOfInterest> regionsOfInterest);
 
     std::string toJson(const std::vector<AlprResult> results, double processing_time_ms = -1);
 

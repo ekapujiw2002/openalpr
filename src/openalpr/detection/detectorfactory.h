@@ -17,42 +17,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OPENALPR_OCR_H
-#define OPENALPR_OCR_H
+#ifndef OPENALPR_DETECTORFACTORY_H
+#define	OPENALPR_DETECTORFACTORY_H
 
-#include <iostream>
-#include <stdio.h>
-
-#include "utility.h"
-#include "postprocess.h"
+#include "detectorcpu.h"
 #include "config.h"
-#include "pipeline_data.h"
 
-#include "constants.h"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "support/filesystem.h"
+Detector* createDetector(Config* config);
 
-#include "tesseract/baseapi.h"
+#endif	/* OPENALPR_DETECTORFACTORY_H */
 
-class OCR
-{
-
-  public:
-    OCR(Config* config);
-    virtual ~OCR();
-
-    void performOCR(PipelineData* pipeline_data);
-
-    PostProcess* postProcessor;
-    //string recognizedText;
-    //float confidence;
-    //float overallConfidence;
-
-  private:
-    Config* config;
-
-    tesseract::TessBaseAPI *tesseract;
-
-};
-
-#endif // OPENALPR_OCR_H
